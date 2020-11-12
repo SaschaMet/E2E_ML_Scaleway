@@ -18,4 +18,4 @@ jobs:
     - name: print folder
       run: ls -a
     - name: run pipeline
-      run: sh ./run_pipeline_ci.sh
+      run: sh ../../run_pipeline_ci.sh
