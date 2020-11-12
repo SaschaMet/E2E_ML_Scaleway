@@ -1,0 +1,6 @@
+/data
+.DS_Store
+__pycache__
+model/history.png
+model/best.model.hdf5
+model/my_model.json
