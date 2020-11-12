@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
-from keras.applications.vgg16 import VGG16
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.models import Sequential, Model
+import tensorflow as tf
+import matplotlib.pyplot as plt
 from keras.optimizers import Adam
+from keras.applications.vgg16 import VGG16
+from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Flatten
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 
 # pylint: disable=import-error
 from pipeline import data_generator
@@ -123,6 +124,8 @@ def train(model, train_df, test_df):
 def start():
     train_df, test_df = load_datasets()
     model = build_model()
+    # free up memory
+    tf.keras.backend.clear_session()
     print("Model Summary", model.summary())
     train(model, train_df, test_df)
 

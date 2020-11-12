@@ -13,7 +13,7 @@
 	},
 	"runArgs": [
 		"--name",
-		"bgp"
+		"bdp"
 	],
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
@@ -33,7 +33,11 @@
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-python.python"
+		"ms-python.python",
+		"njpwerner.autodocstring",
+		"ms-python.vscode-pylance",
+		"kevinrose.vsc-python-indent",
+		"tushortz.python-extended-snippets"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
