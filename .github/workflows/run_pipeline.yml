@@ -69,7 +69,7 @@ jobs:
       uses: jakejarvis/wait-action@master
       with:
         time: '30s'
-    - name: Run Pipeline
+    - name: Train Model
       run: |
         echo "SSH into server"
         # chmod u+x run_pipeline_ci.sh
