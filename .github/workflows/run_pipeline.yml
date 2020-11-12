@@ -15,5 +15,7 @@ jobs:
       with:
         key: ${{ secrets.SSH_KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - name: print folder
+      run: ls -a
     - name: run pipeline
-      run: ./run_pipeline_ci.sh
+      run: sh ./run_pipeline_ci.sh
