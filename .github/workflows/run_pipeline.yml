@@ -16,15 +16,6 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         name: scaleway
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
-    - name: Start Scaleway Server
-      uses: jawher/action-scw@v2.0.0-2
-      env:
-        SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
-        SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
-        SCW_ORGANIZATION_ID: ${{ secrets.SCW_ORGANIZATION_ID }}
-        SCW_ZONE: nl-ams-1
-      with:
-        args: instance server start -w ${{ secrets.SERVER_ID }}
     - name: Run Pipeline
       run: |
         echo "SSH into server"
