@@ -13,7 +13,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping
 # pylint: disable=import-error
 from pipeline import data_generator
 
-EPOCHS = 1
+EPOCHS = 30
 LEARNING_RATE = 1e-4
 DIRECTORY_ROOT = os.path.abspath(Path(os.getcwd()))
 
