@@ -10,9 +10,6 @@ An End-To-End Project from Data Preparation to Model Deployment
 - Optional: Configure s3cmd for file uploading https://www.scaleway.com/en/docs/object-storage-with-s3cmd/
 
 
-traing the model with: python -m model.model.py
-
-
 ## Todo:
 - [x] Get csv with metadata
 - [x] Create pipeline
@@ -21,8 +18,6 @@ traing the model with: python -m model.model.py
 - [x] Create an Image Data Generator under /model (train and test)
 - [x] Create a Model under /model
 - [x] Save the Model under /model
-- [] Create a .sh script for automatically saving the model to S3
-- [] Create a Dockerfile to automatically run the pipeline, train the model and execute the .sh script
-- [] Create an Inference Notebook?
-- [] Create Tensorboard?
-- [] https://cml.dev/ + https://dvc.org/ + https://github.com/EthicalML/awesome-production-machine-learning
+- [x] Create a .sh script for automatically saving the model to S3
+- [x] Create a Dockerfile to automatically run the pipeline, train the model and execute the .sh script
+- [x] Add Flask App
