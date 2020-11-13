@@ -29,10 +29,10 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_CPU }}
 
-    - name: Sleep for 10 seconds
+    - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
-        time: '10s'
+        time: '30s'
     - name: Run Pipeline
       run: |
         echo "SSH into server"
@@ -65,10 +65,10 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_GPU }}
 
-    - name: Sleep for 10 seconds
+    - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
-        time: '10s'
+        time: '30s'
     - name: Train Model
       run: |
         echo "SSH into server"
