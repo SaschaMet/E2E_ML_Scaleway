@@ -11,7 +11,7 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 
 # pylint: disable=import-error
-from pipeline import data_generator
+from . import data_generator
 
 EPOCHS = 30
 LEARNING_RATE = 1e-4
