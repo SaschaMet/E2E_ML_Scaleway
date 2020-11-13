@@ -38,6 +38,8 @@ jobs:
         echo "SSH into server"
         # chmod u+x run_pipeline_ci.sh
         ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_CPU }} << EOF
+          echo "fetch current repo status"
+          git fetch && git pull
           echo "Switching the path to /app"
           cd app
           echo "Run the pipeline"
@@ -74,6 +76,8 @@ jobs:
         echo "SSH into server"
         # chmod u+x run_pipeline_ci.sh
         ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_GPU }}  << EOF
+          echo "fetch current repo status"
+          git fetch && git pull
           echo "Switching the path to /app"
           cd app
           echo "Run the model"
@@ -96,6 +100,8 @@ jobs:
         echo "SSH into server"
         # chmod u+x run_pipeline_ci.sh
         ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_FLASK }}  << EOF
+          echo "fetch current repo status"
+          git fetch && git pull
           echo "Switching the path to app/server"
           cd app/server
           echo "Update the model"
