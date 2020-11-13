@@ -18,8 +18,8 @@ jobs:
         name: scaleway
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-    # Run the pipeline
-    - name: Start Scaleway Server
+    # Run the Pipeline
+    - name: Start Scaleway CPU Server
       uses: jawher/action-scw@v2.0.0-2
       env:
         SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
@@ -29,10 +29,10 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_CPU }}
 
-    - name: Sleep for 30 seconds
+    - name: Sleep for 10 seconds
       uses: jakejarvis/wait-action@master
       with:
-        time: '30s'
+        time: '10s'
     - name: Run Pipeline
       run: |
         echo "SSH into server"
@@ -44,7 +44,7 @@ jobs:
           chmod u+x run_pipeline.sh && ./run_pipeline.sh
           echo "Done"
         EOF
-    - name: Stop Scaleway Server
+    - name: Stop Scaleway CPU Server
       uses: jawher/action-scw@v2.0.0-2
       env:
         SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
@@ -54,8 +54,8 @@ jobs:
       with:
         args: instance server stop ${{ secrets.SERVER_ID_CPU }}
 
-    # Train the model
-    - name: Start Scaleway Server
+    # Train the Model on GPU
+    - name: Start Scaleway GPU Server
       uses: jawher/action-scw@v2.0.0-2
       env:
         SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
@@ -65,10 +65,10 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_GPU }}
 
-    - name: Sleep for 30 seconds
+    - name: Sleep for 10 seconds
       uses: jakejarvis/wait-action@master
       with:
-        time: '30s'
+        time: '10s'
     - name: Train Model
       run: |
         echo "SSH into server"
@@ -80,7 +80,7 @@ jobs:
           chmod u+x run_and_save_model_to_S3.sh && ./run_and_save_model_to_S3.sh
           echo "Done"
         EOF
-    - name: Stop Scaleway Server
+    - name: Stop Scaleway GPU Server
       uses: jawher/action-scw@v2.0.0-2
       env:
         SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
@@ -89,3 +89,16 @@ jobs:
         SCW_ZONE: fr-par-1
       with:
         args: instance server stop ${{ secrets.SERVER_ID_GPU }}
+
+    # Update Model on Flask Server
+    - name: Update Model on Flask Server
+      run: |
+        echo "SSH into server"
+        # chmod u+x run_pipeline_ci.sh
+        ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_FLASK }}  << EOF
+          echo "Switching the path to app/server"
+          cd app/server
+          echo "Update the model"
+          chmod u+x update_model.sh && ./update_model.sh
+          echo "Done"
+        EOF
