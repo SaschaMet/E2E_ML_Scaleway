@@ -1,1 +1,5 @@
 /data
+model/best.model.hdf5
+model/my_model.json
+server/best.model.hdf5
+server/my_model.json
