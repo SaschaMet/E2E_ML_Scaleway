@@ -37,7 +37,7 @@ jobs:
       run: |
         echo "SSH into server"
         # chmod u+x run_pipeline_ci.sh
-        ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_CPU }}  << EOF
+        ssh -i ~/.ssh/scaleway -t ${{ secrets.USER_SERVER_CPU }} << EOF
           echo "Switching the path to /app"
           cd app
           echo "Run the pipeline"
