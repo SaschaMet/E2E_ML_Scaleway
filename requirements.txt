@@ -9,4 +9,3 @@ seaborn
 scikit-image
 sklearn
 Flask
-dill
