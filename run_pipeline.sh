@@ -4,6 +4,7 @@ git reset --hard origin/main
 
 # remove old files
 rm Archive.zip
+rm -rf data
 
 # download the zip file of the dataset
 wget http://scw-ml-example.s3.fr-par.scw.cloud/Archive.zip
