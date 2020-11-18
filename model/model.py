@@ -66,6 +66,7 @@ def load_pretrained_model(layer_of_interest="block5_pool"):
     transfer_layer = model.get_layer(layer_of_interest)
     vgg_model = Model(inputs=model.input, outputs=transfer_layer.output)
 
+    # do not re-train the first layers
     for layer in vgg_model.layers[0:17]:
         layer.trainable = False
 
