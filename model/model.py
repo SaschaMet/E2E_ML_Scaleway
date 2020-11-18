@@ -158,5 +158,4 @@ def start():
     train(model, train_df, test_df)
 
 
-if __name__ == '__main__':
-    start()
+start()
