@@ -1,21 +1,22 @@
 # Machine Learning in the Cloud
 
-A How-to guide from data fetching to model deployment and everything in between
+A How-to guide from data fetching to model deployment and everything in between.
 
 <br>
 
 ## TOC:
 
-1. Goals of this Blog Post
-2. Prerequisites
-3. The Machine Learning Cycle
-4. Exploratory data analysis
-5. Local Setup
-6. Creating a preprocessing pipeline
-7. Creating a pneumonia detector from chest x-rays
-8. Production Deployment
-9. CI / CD with Github Actions
-10. Things to Improve
+1. [Goals of this Blog Post](#Goals-of-this-Blog-Post)
+2. [Prerequisites](#Prerequisites)
+3. [The Machine Learning Cycle](#The-Machine-Learning-Cycle)
+4. [Exploratory Data Analysis](#Exploratory-Data-Analysis)
+5. [Local Setup](#Local-Setup)
+8. [Creating a preprocessing pipeline](#Creating-a-preprocessing-pipeline)
+6. [Creating a Pneumonia detector from chest x-rays](#Creating-a-Pneumonia-detector-from-chest-x-rays)
+7. [Production Deployment](#Production-Deployment)
+9. [CI / CD with GitHub Actions](#CI-/-CD-with-Github-Actions)
+10. [Things to Improve](#Things-to-Improve)
+
 
 <br>
 <br>
@@ -27,17 +28,17 @@ My goal is to demystify machine learning in the cloud. The concept of a "Cloud" 
 - Why it is useful and why you should know it
 - How to set up the necessary infrastructure
 - How to use CPUs for your pipelines and GPUs for your model training
-- How to set up a Flask-Server and deploy your model
-- How to create a CI / CD pipeline with Github Actions to completely automate the process
+- How to set up a flask-server and deploy your model
+- How to create a CI / CD pipeline with GitHub Actions to completely automate the process
 
-The whole project is open source, and you can find it here: [https://github.com/SaschaMet/E2E_ML_Scaleway](https://github.com/SaschaMet/E2E_ML_Scaleway)
+The whole project is open source, you can find it here: [https://github.com/SaschaMet/E2E_ML_Scaleway](https://github.com/SaschaMet/E2E_ML_Scaleway)
 
 <br>
 <br>
 
 ## Prerequisites
 
-We will use Scaleway as our cloud service provider. Not only is Scaleway easy to set up, but it is also very cheap. CPU instances start at 0.0025 € / hour, and a GPU instance only costs 1 € / hour when writing this post. But even if you do not want to use Scaleway, you can learn from this guide and apply it to every other vendor like AWS, GCP, or Linode.
+We will use Scaleway as our cloud service provider. Not only is Scaleway easy to set up, it is also very cheap. CPU instances start at 0.0025 € / hour, and a GPU instance only costs 1 € / hour. But even if you do not want to use Scaleway, you can learn from this guide and apply it to every other vendor like AWS, GCP, or Linode.
 
 To follow this guide, you have to have a Scaleway account and your Scaleway CLI ready. Here are some links which show you how to do it:
 
@@ -45,13 +46,11 @@ To follow this guide, you have to have a Scaleway account and your Scaleway CLI 
 - [https://www.scaleway.com/en/docs/manage-cloud-servers-with-scaleway-cli/](https://www.scaleway.com/en/docs/manage-cloud-servers-with-scaleway-cli/)
 - [https://www.scaleway.com/en/docs/configure-new-ssh-key/](https://www.scaleway.com/en/docs/configure-new-ssh-key/)
 
-It is pretty simple and should not take longer than 15 minutes.
-
-If you want to use a GPU, you have to open a support ticket because GPUs are not available after creating a new account. The process takes approx. 24 hours. This step however is entirely optional. You can follow this guide even without a GPU, too.
+If you want to use a GPU, you have to open a support ticket because GPUs are not available after creating a new account. The process takes approx. 24 hours. This step however is entirely optional. You can follow this guide even without a GPU.
 
 **An important note:** When you follow this guide, you will have to pay for your used resources. Luckily Scaleway is very cheap, but you should expect to pay up to 5 €.
 
-We will use the [NIH Chest X-ray Dataset](https://www.notion.so/Blog-Post-d34e95cea0844332abb8f8d76b40f788) and build a model to detect pneumonia in an X-ray image. The whole dataset consists of 112,120 X-ray images with disease labels from 30,805 unique patients and has a size of 42 GB. Because it would take a tone of time to down- and upload this dataset, I will only use a subset (~ 1,400 images). That is enough to train a model, but if you want to, you can work with the whole dataset as well.
+We will use the [NIH Chest x-ray Dataset](https://www.notion.so/Blog-Post-d34e95cea0844332abb8f8d76b40f788) and build a model to detect Pneumonia in an x-ray image. The whole dataset consists of 112,120 x-ray images with disease labels from 30,805 unique patients and has a size of 42 GB. Because it would take a tone of time to down- and upload this dataset, I will only use a subset of ~ 1,400 images. That is enough to train a model, but if you want to, you can work with the whole dataset as well.
 
 <br>
 <br>
@@ -64,7 +63,7 @@ We will use the [NIH Chest X-ray Dataset](https://www.notion.so/Blog-Post-d34e9
 
 *The Machine Learning Cycle - Source: [https://acloudguru.com](https://acloudguru.com/)*
 
-The ML Cycle is a series of steps from fetching your data, cleaning an preparing it, model training and evaluation to production deployment as well as monitoring and evaluation. It gives you a good overview on what you have to do to develop, train and deploy your model to production.
+The ML Cycle is a series of steps from fetching your data, cleaning and preparing it, model training and evaluation, and finally, production deployment and monitoring and evaluation. It gives you a good overview of what you have to do to develop, train, and deploy your model to production.
 
 <br>
 
@@ -72,9 +71,9 @@ The ML Cycle is a series of steps from fetching your data, cleaning an preparing
 
 You do not need a cloud provider to build a machine learning solution. After all, there are plenty of open-source machine learning frameworks that can run on local hardware. But if you want to develop sophisticated models in-house, you will likely run into scaling issues because training models on real-world data typically require large compute clusters.
 
-A cloud provider lets you quickly scale your computing power. You can, for example, train your model on a hundred GPUs at the same time. And the good thing is you don't have to buy them upfront. Most providers offer a pay-per-use model, so you only pay for the resources you use.
+A cloud provider lets you quickly scale your computing power. You can, for example, train your model on hundred GPUs at the same time. And the good thing is you don't have to buy them upfront. Most providers offer a pay-per-use model, so you only pay for the resources you use.
 
-The cloud also makes it easy for enterprises to experiment with machine learning capabilities and scale up as projects go into production and demand for those features increases. Also, AWS, Microsoft Azure, and Google Cloud Platform offer many machine learning options that don't require in-depth knowledge of AI, machine learning theory, or a team of data scientists. They even advertise with "Machine Learning per Drag & Drop" [[https://techcrunch.com/2019/05/02/microsoft-launches-a-drag-and-drop-machine-learning-tool-and-hosted-jupyter-notebooks/](https://techcrunch.com/2019/05/02/microsoft-launches-a-drag-and-drop-machine-learning-tool-and-hosted-jupyter-notebooks/)]
+The cloud also makes it easy for enterprises to experiment with machine learning capabilities and scale up as projects go into production and demand for those features increases. Also, AWS, Microsoft Azure, and Google Cloud Platform offer many machine learning options that don't require in-depth knowledge of AI, machine learning theory, or a team of data scientists. They even advertise with [Machine Learning per Drag & Drop](https://techcrunch.com/2019/05/02/microsoft-launches-a-drag-and-drop-machine-learning-tool-and-hosted-jupyter-notebooks/).
 
 <br>
 
@@ -85,13 +84,13 @@ A survey by Tech Pro Research found that just 28% of companies have some experie
 <br>
 <br>
 
-## Exploratory data analysis - EDA
+## Exploratory Data Analysis
 
 Understanding your data is an absolute must in every data science project. So let's have a look at our dataset:
 
-- The NIH Chest X-ray Dataset consists of 112,120 X-ray images with disease labels from 30,805 unique patients
+- The NIH Chest x-ray Dataset consists of 112,120 x-ray images with disease labels from 30,805 unique patients
 - The authors used Natural Language Processing to create these labels to text-mine disease classifications from the associated radiological reports. The labels are expected to be >90% accurate
-- Chest X-rays are one of the most frequent and cost-effective medical imaging examinations available. However, clinical diagnosis of a chest X-ray can be challenging
+- Chest x-rays are one of the most frequent and cost-effective medical imaging examinations available. However, clinical diagnosis of a chest x-ray can be challenging
 - There are 15 classes (14 diseases and one for "No findings") in the dataset. Images can be classified as "No findings" or one or more disease classes:
     - Atelectasis
     - Consolidation
@@ -170,7 +169,7 @@ The most common value, besides Pneumonia, is "No finding." The most common disea
 
 <br>
 
-Finally, let's look at some X-Rays. I have plotted the images together with a standardized distribution of the pixel intensity.
+Finally, let's look at some x-rays. I have plotted the images together with a standardized distribution of the pixel intensity.
 
 **Images with Pneumonia**
 
@@ -186,9 +185,9 @@ Finally, let's look at some X-Rays. I have plotted the images together with a st
 
 ![Image without Pneumonia 2](./images/image-4.png)
 
-As you can see, pneumonia and non-pneumonia patients' intensity distributions follow more of a normal distribution. As already mentioned above, the diagnosis of pneumonia from chest X-rays can be challenging. This has several reasons:
+As you can see, Pneumonia and non-Pneumonia patients' intensity distributions follow more of a normal distribution. As already mentioned above, the diagnosis of Pneumonia from chest x-rays can be challenging. This has several reasons:
 
-1. The appearance of pneumonia in a chest X-ray can be very vague depending on the stage of the infection
+1. The appearance of Pneumonia in a chest x-ray can be very vague depending on the stage of the infection
 2. Pneumonia often overlaps with other diseases
 3. Pneumonia can mimic benign abnormalities
 
@@ -209,7 +208,7 @@ git clone https://github.com/SaschaMet/E2E_ML_Scaleway.git
 
 and our dataset from here:  [https://scw-ml-example.s3.fr-par.scw.cloud/Archive.zip](https://scw-ml-example.s3.fr-par.scw.cloud/Archive.zip)
 
-Done!
+<br>
 
 If you want to play with the code locally, you have to do three more steps:
 
@@ -219,17 +218,17 @@ If you want to play with the code locally, you have to do three more steps:
 mkdir data
 ```
 
-2. Open the zip-File and move the images Folder with our X-Ray images into the data directory.
+2. Open the zip-File and move the images Folder with our x-ray images into the data directory.
 
-3. Install all dependencies with
+3. Install the dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Now your ready and you can use the project on your local computer.
+Now you are ready and you can use the project on your local computer.
 
-But our real goal is to move the project to the cloud. When you're ready, let's move on and create our preprocessing pipeline.
+But our real goal is to move the project to the cloud. So when you're ready, let's move on and create our preprocessing pipeline.
 
 <br>
 <br>
@@ -244,13 +243,11 @@ For our preprocessing pipeline, we need a few things:
 - A python file with the code of our pipeline
 - A server to run our code on
 
-But first of all, we need a place to store everything. We need a place to keep our images and storing our trained model so we can deploy it to production and many other things. So let us create data storage in the cloud.
-
 <br>
 
 **Creating a Data Storage**
 
-We need a place to store our images and our trained model to deploy it to production and many other things. The easiest way to create such data storage is through the Scaleway Console. After logging in to your account, go to "Data Storage" and create a new bucket. It is best to make it in the Paris Region because Scaleway only offers GPUs in this region, and the data transfer is faster when the data is stored in the same place.
+We need a place to store our images, our trained model to deploy and many other things. The easiest way to create such data storage is through the Scaleway console. After logging in to your account, go to "Data Storage" and create a new bucket. It is best to make it in the Paris Region because Scaleway only offers GPUs in this region, and the data transfer is faster when the data is stored in the same place.
 
 ![Create a bucket on Scaleway](./images/create-a-bucket-scaleway.png)
 
@@ -335,7 +332,7 @@ def create_splits(df, test_size, classToPredict):
     print("train_df", train_df.shape)
     print("test_df", test_df.shape)
 
-    # Check the distribution of pneumonia cases in the test and validation set
+    # Check the distribution of Pneumonia cases in the test and validation set
     print("train distribution before",
           train_df['Pneumonia'].sum()/len(train_df))
     print("test distribution before", test_df['Pneumonia'].sum()/len(test_df))
@@ -389,9 +386,9 @@ To execute our pipeline, we have to upload our python script and transfer our da
 ssh -i ~/.ssh/[path_to_your_private_ssh_key] root@[server_ip]
 ```
 
-You can find the detailed documentation here: [https://www.scaleway.com/en/docs/create-and-connect-to-your-server](https://www.scaleway.com/en/docs/create-and-connect-to-your-server)
+You can find the detailed documentation on how to connect to your instance here: [https://www.scaleway.com/en/docs/create-and-connect-to-your-server](https://www.scaleway.com/en/docs/create-and-connect-to-your-server)
 
-The dataset is stored in our data storage. To get it, we need to install S3CMD. S3cmd is a free command-line tool and client for uploading, retrieving, and managing data in Amazon S3 and other cloud storage service providers (Scaleway uses S3 under the hood).
+The dataset is stored in our data storage. To get it, we need to install S3CMD. S3CMD is a free command-line tool and client for uploading, retrieving, and managing data in Amazon S3 and other cloud storage service providers (Scaleway uses S3 under the hood).
 
 <br>
 
@@ -400,8 +397,8 @@ The dataset is stored in our data storage. To get it, we need to install S3CMD. 
 First we have to install it:
 
 ```bash
-# install s3cmd
-apt-get update && apt-get install s3cmd -y
+# install S3CMD
+apt-get update && apt-get install S3CMD -y
 ```
 
 Create the configuration file with:
@@ -416,14 +413,9 @@ Edit the file:
 ```bash
 # open the file in vim
 vim .s3cfg
-
-# enter the insert mode
-i
-
-# copy
 ```
 
-To enter the Inser-Mode in vim type " i ", then copy & paste the config:
+To enter the Inser-Mode in vim type `i`, then copy & paste the config:
 
 ```bash
 [default]
@@ -442,13 +434,13 @@ access_key = <Your_Scaleway_Access_Key>
 secret_key = <Your_Scaleway_Secret_Key>
 ```
 
-To save the file, quit the insert mode by clicking the escape-Button on your keyboard and then save & quit vim by typing ":wp."
+To save the file, quit the insert mode by clicking the escape-Button on your keyboard and then save & quit vim by typing `:wp`
 
 <br>
 
 You can find your access and secret key in your Scaleway console: [https://console.scaleway.com/project/credentials](https://console.scaleway.com/project/credentials)
 
-If you want to know what else you can do with S3CMD, check out the docs: [https://www.scaleway.com/en/docs/object-storage-with-s3cmd/](https://www.scaleway.com/en/docs/object-storage-with-s3cmd/))
+If you want to know what else you can do with S3CMD, check out the docs: [https://www.scaleway.com/en/docs/object-storage-with-S3CMD/](https://www.scaleway.com/en/docs/object-storage-with-S3CMD/))
 
 <br>
 
@@ -503,16 +495,16 @@ The -v option tells Docker to sync the files from the container back to our disk
 
 <br>
 
-Now we can put our training and testing CSV-file into our data store:
+Now we can upload our training and testing CSV-files to our data store:
 
 ```bash
-s3cmd put File data/testing_set.csv s3://[your_bucket_name] --acl-public
-s3cmd put File data/training_set.csv s3://[your_bucket_name] --acl-public
+S3CMD put File data/testing_set.csv s3://[your_bucket_name] --acl-public
+S3CMD put File data/training_set.csv s3://[your_bucket_name] --acl-public
 ```
 
 **Important note: The --acl-public is used to make your files publicly available. Please make sure the files are publicly available because we need to download them later!**
 
-And we're done! We successfully executed our pipeline on a server in the cloud 🥳
+And we're done! We successfully executed our pipeline 🥳
 
 Because there is no need anymore for our server, we can shut it down:
 
@@ -529,7 +521,7 @@ Quite a few steps for executing a simple python file, huh? The good thing is we 
 chmod u+x run_pipeline.sh && ./run_pipeline.sh
 ```
 
-This shell-Script will:
+This shell-script will:
 
 - Fetch the current GitHub repository
 - Build and run the docker image
@@ -540,14 +532,16 @@ Much better! Now to the fun part, creating and training our machine learning mod
 <br>
 <br>
 
-## Creating a pneumonia detector from chest x-rays
+## Creating a Pneumonia detector from chest x-rays
 
 Most of the initial things we have to do will be the same as above:
 
-1. We have to create our server.
-2. We have to configure S3CMD.
-3. We have to download the dataset and our GitHub repo
-4. And finally, we have to build and run our Docker image.
+1. We have to create a server
+2. We have to configure S3CMD
+3. We have to download the dataset and the GitHub repo
+4. And finally, we have to build and run the Docker image
+
+<br>
 
 Create a GPU instance
 
@@ -566,8 +560,8 @@ ssh -i ~/.ssh/[private_key] root@[instance_ip]
 Install and configure S3CMD
 
 ```bash
-# install s3cmd
-apt-get update && apt-get install s3cmd -y
+# install S3CMD
+apt-get update && apt-get install S3CMD -y
 ```
 
 ```bash
@@ -578,12 +572,9 @@ touch .s3cfg
 ```bash
 # open the file in vim
 vim .s3cfg
-
-# enter the insert mode
-i
 ```
 
-Save the config:
+Paste the config:
 
 ```bash
 [default]
@@ -635,7 +626,7 @@ cd data && unzip Archive.zip && cd ..
 rm -rf data/__MACOSX
 ```
 
-The heart of our application is the code for our model. The first piece is an image data generator. This script will return a generator function, which itself returns a batch of images when called, and in the case of our training set, will do a few image augmentations.
+The heart of our application is the machine learning model. Here is the first piece, an image data generator function. This script will return a generator function, which itself returns a batch of images when called, and in the case of our training set, it will do a few image augmentations.
 
 ```python
 # /model/data_generator.py
@@ -710,7 +701,7 @@ def create_test_data(test_df):
     return train_gen
 ```
 
-And here is the code of our model. I use the pre-trained VGG16 model and only add a few Dense layers at the end. These layers will (hopefully) learn to detect pneumonia in our x-rays.
+And here is the code of our machine learning model. I use the pre-trained VGG16 model and only add a few Dense layers at the end. These layers will (hopefully) learn to detect Pneumonia in our x-rays.
 
 ```python
 # /model/model.py
@@ -888,22 +879,22 @@ docker run --name mlscwexample --rm -v "$PWD":/app mlscwexample python -m model.
 Upload the results to our data storage
 
 ```bash
-s3cmd put File model/best.model.hdf5 s3://scw-ml-example --acl-public
-s3cmd put File model/history.png s3://scw-ml-example --acl-public
-s3cmd put File model/my_model.json s3://scw-ml-example --acl-public
+S3CMD put File model/best.model.hdf5 s3://scw-ml-example --acl-public
+S3CMD put File model/history.png s3://scw-ml-example --acl-public
+S3CMD put File model/my_model.json s3://scw-ml-example --acl-public
 ```
 
 Here we upload our model, our model weights, and a png-image with our training results.
 
 **Important note: The --acl-public is used to make your files publicly available. Please make sure the files are publicly available because we need to download them later!**
 
-Because the GPU is expensive and we do not need it anymore, we can shut it down again:
+Because the GPU is expensive and we do not need it anymore, we can shut it down:
 
 ```bash
 scw instance server stop [id_of_your_instance]
 ```
 
-And again, there's a shell-Script to execute it all at once:
+And again, there's a shell-script to execute it all at once:
 
 ```bash
 chmod u+x run_and_save_model_to_S3.sh && ./run_and_save_model_to_S3.sh
@@ -912,7 +903,7 @@ chmod u+x run_and_save_model_to_S3.sh && ./run_and_save_model_to_S3.sh
 <br>
 <br>
 
-Let's do a quick recap. So far, we have a pipeline, an ML model to detect pneumonia, and we have saved the model to our data storage. To make use of our model, we need (again) a server and some way to communicate with it. The easiest way is to create a REST-API with a simple flask server. This server will receive an image, make the prediction, and return the result.
+Let's do a quick recap. So far, we have a pipeline, an ML model to detect Pneumonia, and we have saved the model to our data storage. To make use of our model, we need (again) a server and some way to communicate with it. The easiest way is to create a REST-API with a simple flask server. This server will receive an image, make the classification, and return the result.
 
 So let's do it (this will be the last server for today, I promise 🤞).
 
@@ -927,7 +918,7 @@ Here I will create the same type of server as for our pipeline. If you want to u
 scw instance server create type=DEV1-S image=89c80d27-ddf4-4ffa-8215-b335cce3fd05 root-volume=l:20G name=scw-example-server ip=new project-id=7ee9051f-09cd-46f8-8b91-00f8dc3149bb
 ```
 
-SSH into your server:
+SSH into the server:
 
 ```bash
 ssh -i ~/.ssh/[private_key] root@[instance_ip]
@@ -957,7 +948,7 @@ wget https://scw-ml-example.s3.fr-par.scw.cloud/my_model.json &&
 wget https://scw-ml-example.s3.fr-par.scw.cloud/best.model.hdf5
 ```
 
-Build docker image
+Build the docker image
 
 ```bash
 docker build -t mlscwexample .
@@ -976,20 +967,20 @@ curl --location --request POST '[Your_Server_IP]' \
 --form 'file=@[path_to_a_x_ray_image]'
 ```
 
-You sure can use tools like Postman, too. The reponse from the server should in both cases look like this:
+You can use tools like Postman, too. The response from the server should look like this:
 
 ![API response](./images/postman.png)
 
-We've done it. We have a production server on which our model is running and making predictions. To complete the ML Cycle, we still have to set up additional monitoring for our server and evaluate our model against the predictions it makes. Because these steps depend strongly on the use case and your requirements, I will skip this step. But if you want to keep going, I recommend the ELK-Stack for your server monitoring ([https://www.elastic.co/log-monitoring](https://www.elastic.co/log-monitoring)), and here ist an excellent blog post from Nanonets about model evaluation: [https://nanonets.com/blog/machine-learning-production-retraining](https://nanonets.com/blog/machine-learning-production-retraining)
+We've done it. We have a production server on which our model is running. To complete the ML Cycle, we still have to set up additional monitoring and evaluate our model against its classification. Because these steps depend strongly on the use case and your requirements, I will skip this step. But if you want to keep going, I recommend the ELK-Stack for your server monitoring ([https://www.elastic.co/log-monitoring](https://www.elastic.co/log-monitoring)), and here ist an excellent blog post from Nanonets about model evaluation: [https://nanonets.com/blog/machine-learning-production-retraining](https://nanonets.com/blog/machine-learning-production-retraining)
 
-We're done now. If you want to change something in the codebase, you have to start your instance, log into your server, execute the shell-Script, upload your data to your data store, and shut down your server again. It is relatively easy, but I think we can still do better.
+But we're not done now. If you want to change something in the codebase, you have to rerun everything. You have to start your instances, log into your servers, execute the shell-scripts, upload the data to your data store, and shut down every server afterward. I think we can do better.
 
 <br>
 <br>
 
 ## CI / CD with GitHub Actions
 
-In most cases, you want to execute the ML Cycle when you have made changes to your code, e.g., improved your model or changed your pipeline. It would also be ideal if the process could run automatically when you create a Pull Request so you won't have to run it on your own.
+In most cases, you want to execute the whole ML Cycle when you have made changes to your code, e.g., improved your model or updated your pipeline. It would also be ideal if the process could run automatically when you create a Pull Request so you won't have to start it on your own.
 
 Welcome to GitHub Actions! GitHub Actions allow us to define steps that will be executed automatically every time we create a pull request or merge a feature branch into our main branch.
 
@@ -1007,7 +998,7 @@ on:
 
 jobs:
   build:
-		runs-on: ubuntu-latest
+	runs-on: ubuntu-latest
     steps:
 
     # Install and set the SSH Keys we need to login into our instances
@@ -1029,7 +1020,7 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_CPU }}
 
-		# When trying to connect to the server directly after it has started sometimes there is an error
+	# When trying to connect to the server directly after it has started sometimes there is an error
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
@@ -1068,7 +1059,7 @@ jobs:
       with:
         args: instance server start -w ${{ secrets.SERVER_ID_GPU }}
 
-		# When trying to connect to the server directly after it has started sometimes there is an error
+	# When trying to connect to the server directly after it has started sometimes there is an error
     - name: Sleep for 30 seconds
       uses: jakejarvis/wait-action@master
       with:
@@ -1097,7 +1088,7 @@ jobs:
         args: instance server stop ${{ secrets.SERVER_ID_GPU }}
 ```
 
-This action does the same thing we would do, from starting the server, executing scripts, and shutting everything down again.
+This action does the same thing we would do, from starting the server, executing scripts, and shutting everything down again. Except it does it automatically.
 
 You can also see that we use a couple of secrets so our action can do its job. These secrets are, for example, the access keys for Scaleway or our server IP-addresses. You can add secrets to your repository under Settings → Secrets. Here are the secrets we need:
 
@@ -1126,41 +1117,47 @@ The server ID of your gpu instance (normally root@[gpu_instance_ip])
 
 <br>
 
-After creating the file for your GitHub action and adding your secrets, you can make a code change to your main branch. Your workflow should then start:
+After creating the file for your GitHub Action and adding your secrets, you can make a new pull request, and your workflow should start:
 
 ![CI pipeline](./images/ci-pipeline.png)
 
 <br>
 
-You can adapt the action file as you wish. There are many workflow templates you can choose from, and there are many ways to improve our workflow.
+You can adapt the workflow as you wish. Also, there are many ways to improve our current workflow:
 
-For example, you could create a second GitHub action, which will be executed after you have merged a pull request into your master branch to reboot your production server after fetching the current model from your data store.
+For example, you could create a second GitHub Action, which will be executed after you have merged a pull request into your master branch to reboot your production server after fetching the new model from your data store.
 
-Another idea for a GitHub action is to skip the creation of docker images whenever we want to run the pipeline or train the model. You can upload the Docker images to Dockerhub and tell your GitHub action to login into your Dockerhub account and download the image from there (that's why we use the docker image when setting up our instances in the first place).
+Another idea is to skip building docker images whenever we want to run the pipeline or train the model. You can upload the images to Dockerhub and tell your GitHub Action to login into your Dockerhub account and download the image from there. If I would work on a bigger project, this is definitely a thing I would want to have. And because we use instances with Docker already installed, it is no problem to do this.
 
 <br>
+<br>
 
-Besides CI / CD pipelines, there are also a couple of things we could do to improve the project in general:
+## Things to improve
+<br>
 
-- **Continuous Machine Learning (CML)**
+Besides CI / CD pipelines, there are also a couple of other things we could do to improve the project in general:
+
+- **Continuous Machine Learning (CML)**<br>
 Comparing ML experiments across your project history and monitoring changing datasets has never been easier. With CML, you can include metrics from your updated model directly in your pull requests and compare them with your current model: ![CML](./images/cml.png)
     Source: [https://github.com/iterative/cml/blob/master](https://github.com/iterative/cml/blob/master/imgs/cml_first_report.png)
 
-- **Data Version Control (DVC)**
-Have you ever heard of DVC ([https://dvc.org](https://dvc.org/))? DVC is an excellent tool for every data scientist. It is git for your datasets. Instead of downloading your zip-files or images manually, type `dvc pull`, and it will download your data.
+- **Data Version Control (DVC)**<br>
+Have you ever heard of DVC ([https://dvc.org](https://dvc.org/))? DVC is an excellent tool for every data scientist. It is git for your datasets. Instead of downloading your zip-files or images manually, type `dvc pull`, and it will download your data. It also tracks changes in your datasets.
 
-- **Data Streams**
-Instead of downloading your data, you can also work with streams. Downloading 1 GB is no problem, but what about 50 GB? Or 100 GB? This would take forever. With data streams, you don't have to download the whole dataset to begin training your model. Instead, the model training starts when the data stream begins. If you want to dive deeper, here is a great blog post which explains this concept in-depth: [https://medium.com/analytics-vidhya/data-streams-and-online-machine-learning-in-python-a382e9e8d06a](https://medium.com/analytics-vidhya/data-streams-and-online-machine-learning-in-python-a382e9e8d06a)
+- **Data Streams**<br>
+Instead of downloading your data, you can also work with streams. Downloading 1 GB is no problem, but what about 50 GB? Or 100 GB? Or a Terabyte? This would take forever. With data streams, you don't have to download the whole dataset to begin training your model. Instead, the model training starts when the data stream begins. If you want to dive deeper, [here is a great blog post](https://medium.com/analytics-vidhya/data-streams-and-online-machine-learning-in-python-a382e9e8d06a) which explains this concept in-depth.
 
-- **Kubernetes**
+- **Kubernetes**<br>
 Sometimes we have so much data that one GPU is not enough and training our model would take ages. In this case you would have to use multiple GPUs and distribute your model training. With Kubernetes it is easy to scale up your instances and mange your training. [Sacleway supports Kubernetes](https://www.scaleway.com/en/kubernetes-kapsule/) and you can use [Kubeflow's Tensorflow job operator](https://www.kubeflow.org/docs/components/training/tftraining/) to handle distributed TensorFlow training jobs.
 
-- **Model optimization**
-We might have a good infrastructure but this helps no one if our model is useless. We didn't focus on model optimization in this blog post but there is much we can do to improve it. For example, you can use [more data](https://www.kaggle.com/nih-chest-xrays/data),  look into [Hyperparameter tuning](https://blog.tensorflow.org/2020/01/hyperparameter-tuning-with-keras-tuner.html) or learn more about [machine learning in healthcare](https://www.coursera.org/learn/fundamental-machine-learning-healthcare).
+- **Model optimization**<br>
+We might have a good infrastructure but this helps no one if our model is useless. We didn't focus on model optimization in this blog post but there is much we can do to improve it. For example, you can use [more data](https://www.kaggle.com/nih-chest-xrays/data),  look into [Hyperparameter tuning](https://blog.tensorflow.org/2020/01/hyperparameter-tuning-with-keras-tuner.html) or learn more about [machine learning in the healthcare sector](https://www.coursera.org/learn/fundamental-machine-learning-healthcare).
 
-- **Server Monitoring or Serverless Functions**
-At the moment, we do not have a monitoring system for our server. We would not notice if an error occurs or something else breaks. As already mentioned above, a good monitoring system is key: [https://www.elastic.co/log-monitoring](https://www.elastic.co/log-monitoring). An alternative is serverless functions.
-These functions are hosted on managed infrastructure, which means you do not have to manage them yourself. Your cloud service provider does that! You give them a function you want to execute, and they create and host the server your function can run on. You also only pay for every function call, not for a whole server. That would be great in our case because our flask-server executes only one function, not more, and instead of running an expensive server for this one function, we could use serverless functions. And [Scaleway supports serverless functions](https://www.scaleway.com/en/betas/#serverless), too.
+- **Server Monitoring or Serverless Functions**<br>
+At the moment, we do not have a monitoring system for our server. We would not notice if an error occurs or something breaks. As already mentioned above, a good monitoring system is key and one of my favorites is this one: [https://www.elastic.co/log-monitoring](https://www.elastic.co/log-monitoring).
+<br>
+An alternative to our server is a so-called serverless function.
+These functions are hosted on managed infrastructure, which means you do not have to manage them yourself. Your cloud service provider does that! You give them a function you want to execute, and they create and host the infrastructure your code can run on. You also only pay for every function call, not for a whole server. That would be great in our case because our flask-server executes only one function, not more, and instead of running an expensive server for this one piece of code, we could use serverless functions. And [Scaleway supports serverless functions](https://www.scaleway.com/en/betas/#serverless), too.
 
 <br>
 
