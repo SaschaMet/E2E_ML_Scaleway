@@ -19,12 +19,23 @@ DIRECTORY_ROOT = os.path.abspath(Path(os.getcwd()))
 
 
 def load_datasets():
+    """Helper function to get the training and testing dataset
+
+    Returns:
+        dataframe: Testing dataframe
+        dataframe: Training dataframe
+    """
     test_df = pd.read_csv(DIRECTORY_ROOT + '/data/testing_set.csv')
     train_df = pd.read_csv(DIRECTORY_ROOT + '/data/training_set.csv')
     return train_df, test_df
 
 
 def save_history(history):
+    """Helper function to save a png image of the loss and accuracy
+
+    Args:
+        history ([tf history]): The history object of a tf model
+    """
     f = plt.figure()
     f.set_figwidth(15)
 
@@ -44,7 +55,13 @@ def save_history(history):
 
 
 def load_pretrained_model(layer_of_interest="block5_pool"):
+    """Helper function to load the VGG16 model
 
+    Args:
+        layer_of_interest (str optional): The transfer layer. Defaults to "block5_pool".
+
+    Returns: VGG16 Model
+    """
     model = VGG16(include_top=True, weights='imagenet')
     transfer_layer = model.get_layer(layer_of_interest)
     vgg_model = Model(inputs=model.input, outputs=transfer_layer.output)
@@ -56,6 +73,10 @@ def load_pretrained_model(layer_of_interest="block5_pool"):
 
 
 def build_model():
+    """Function to build the ml model
+
+    Returns: ML Model
+    """
 
     model = Sequential()
 
@@ -80,6 +101,13 @@ def build_model():
 
 
 def train(model, train_df, test_df):
+    """Function to train the model
+
+    Args:
+        model: The model which should be trained
+        train_df (dataframe): Training dataframe
+        test_df (dataframe): Testing dataframe
+    """
     epochs = EPOCHS
     optimizer = Adam(lr=LEARNING_RATE)
     loss = 'binary_crossentropy'
@@ -95,15 +123,15 @@ def train(model, train_df, test_df):
     weight_path = DIRECTORY_ROOT + "/model/best.model.hdf5"
 
     checkpoint = ModelCheckpoint(weight_path,
-                                 monitor='val_loss',
-                                 verbose=1,
-                                 save_best_only=True,
-                                 mode='auto',
-                                 save_weights_only=True)
+                                monitor='val_loss',
+                                verbose=1,
+                                save_best_only=True,
+                                mode='auto',
+                                save_weights_only=True)
 
     early = EarlyStopping(monitor='val_loss',
-                          mode='auto',
-                          patience=10)
+                        mode='auto',
+                        patience=10)
 
     callbacks_list = [checkpoint, early]
 
@@ -130,4 +158,5 @@ def start():
     train(model, train_df, test_df)
 
 
-start()
+if __name__ == '__main__':
+    start()

@@ -5,18 +5,31 @@ BATCH_SIZE = 64
 
 
 def image_augmentation():
+    """Helper function to create ImageDataGenerator function
+
+    Returns: image data generator function
+    """
     idg = ImageDataGenerator(rescale=1 / 255.0,
-                             horizontal_flip=True,
-                             vertical_flip=False,
-                             height_shift_range=0.1,
-                             width_shift_range=0.1,
-                             rotation_range=25,
-                             shear_range=0.1,
-                             zoom_range=0.15)
+                            horizontal_flip=True,
+                            vertical_flip=False,
+                            height_shift_range=0.1,
+                            width_shift_range=0.1,
+                            rotation_range=25,
+                            shear_range=0.1,
+                            zoom_range=0.15)
     return idg
 
 
 def make_train_gen(df):
+    """Generate batches of tensor image data with real-time data augmentation.
+    The data will be looped over (in batches).
+
+    Args:
+        df ([dataframe]): [dataframe of the training data]
+
+    Returns:
+        [generator function]: Generator function for training data
+    """
     idg = image_augmentation()
     train_gen = idg.flow_from_dataframe(dataframe=df,
                                         directory=None,
@@ -30,6 +43,15 @@ def make_train_gen(df):
 
 
 def make_test_gen(valid_df):
+    """Generate batches of tensor image data with real-time data augmentation.
+    The data will be looped over (in batches).
+
+    Args:
+        df ([dataframe]): [dataframe of the testing data]
+
+    Returns:
+        [generator function]: Generator function for testing data
+    """
     test_idg = ImageDataGenerator(rescale=1. / 255.0)
     test_gen = test_idg.flow_from_dataframe(dataframe=valid_df,
                                             directory=None,

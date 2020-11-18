@@ -2,6 +2,16 @@
 git fetch
 git reset --hard origin/main
 
+# download the zip file of the dataset
+wget http://scw-ml-example.s3.fr-par.scw.cloud/Archive.zip
+
+# move the file to the a new data /directory
+mkdir data && mv Archive.zip data/Archive.zip
+
+# unpack the zip file
+cd data && unzip Archive.zip && cd ..
+rm -rf data/__MACOSX
+
 docker build -t mlscwexample .
 docker run --name mlscwexample --rm -v "$PWD":/app mlscwexample python pipeline/run_pipeline.py
 s3cmd put File data/testing_set.csv s3://scw-ml-example --acl-public

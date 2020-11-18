@@ -15,6 +15,14 @@ DIRECTORY_ROOT = os.path.abspath(Path(os.getcwd()))
 
 
 def preprocess_image(img):
+    """Helper function to process the image so our model can make a prediction
+
+    Args:
+        img (np array): Array of the image data
+
+    Returns:
+        np array: The processed image
+    """
     img = load_img(img, grayscale=True, target_size=IMG_SIZE)
     img = img_to_array(img)
     proc_img = img.reshape((1, IMG_SIZE[0], IMG_SIZE[1], 1))
@@ -23,6 +31,10 @@ def preprocess_image(img):
 
 
 def load_model():
+    """Helper function to load the model
+
+    Returns: ML Model
+    """
     model_path = DIRECTORY_ROOT + "/server/my_model.json"
     weight_path = DIRECTORY_ROOT + "/server/best.model.hdf5"
     with open(model_path, 'r') as json_file:
@@ -33,6 +45,15 @@ def load_model():
 
 
 def predict_image(model, img):
+    """Helper function to make a prediction
+
+    Args:
+        model (ML Model): A ML Model
+        img (np array): np array of the image data
+
+    Returns:
+        str: A Prediction
+    """
     if model.predict(img) > THRESH:
         return 'Pneumonia'
     else:
@@ -40,6 +61,14 @@ def predict_image(model, img):
 
 
 def createPrediction(data):
+    """Helper function to create a prediction
+
+    Args:
+        data (form-data): Image data sent via POST-Request
+
+    Returns:
+        object: Prediction
+    """
     if data is None:
         return {
             "msg": "Invalid image"
