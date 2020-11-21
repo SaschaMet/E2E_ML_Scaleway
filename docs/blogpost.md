@@ -6,17 +6,16 @@ A How-to guide from data fetching to model deployment and everything in between.
 
 ## TOC:
 
-1. [Goals of this Blog Post](#Goals-of-this-Blog-Post)
-2. [Prerequisites](#Prerequisites)
-3. [The Machine Learning Cycle](#The-Machine-Learning-Cycle)
-4. [Exploratory Data Analysis](#Exploratory-Data-Analysis)
-5. [Local Setup](#Local-Setup)
-8. [Creating a preprocessing pipeline](#Creating-a-preprocessing-pipeline)
-6. [Creating a Pneumonia detector from chest x-rays](#Creating-a-Pneumonia-detector-from-chest-x-rays)
-7. [Production Deployment](#Production-Deployment)
-9. [CI / CD with GitHub Actions](#CI-/-CD-with-Github-Actions)
-10. [Things to Improve](#Things-to-Improve)
-
+1. Goals of this Blog Post
+2. Prerequisites
+3. The Machine Learning Cycle
+4. Exploratory Data Analysis
+5. Local Setup
+8. Creating a preprocessing pipeline
+6. Creating a Pneumonia detector from chest x-rays
+7. Production deployment
+9. CI / CD with GitHub Actions
+10. Things to Improve
 
 <br>
 <br>
