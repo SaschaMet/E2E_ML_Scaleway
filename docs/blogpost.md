@@ -426,10 +426,6 @@ bucket_location = fr-par
 use_https = True
 
 # Login credentials
-access_key = SCWXM3JC0TAZSHCJF5H3
-secret_key = 8c0e406f-8b8a-4399-8b42-33c9eba84b48
-
-# Login credentials
 access_key = <Your_Scaleway_Access_Key>
 secret_key = <Your_Scaleway_Secret_Key>
 ```
@@ -583,10 +579,6 @@ host_base = s3.fr-par.scw.cloud
 host_bucket = %(bucket)s.s3.fr-par.scw.cloud
 bucket_location = fr-par
 use_https = True
-
-# Login credentials
-access_key = SCWXM3JC0TAZSHCJF5H3
-secret_key = 8c0e406f-8b8a-4399-8b42-33c9eba84b48
 
 # Login credentials
 access_key = <Your_Scaleway_Access_Key>
